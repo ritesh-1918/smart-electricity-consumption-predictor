@@ -13,93 +13,138 @@ pinned: false
 [![License: MIT](https://img.shields.Format/badge/License-MIT-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.Format/badge/Python-3.8%2B-blue)](requirements.txt)
 [![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
-[![R2 Accuracy](https://img.shields.Format/badge/Model%20Accuracy%20(R2)-94.95%25-neon)](src/train.py)
+[![Model Accuracy](https://img.shields.Format/badge/R2%20Accuracy-94.95%25-green)](src/train.py)
 
-> **"Demystifying Power Demands, Optimizing Consumption Footprints."**
-
-Volterra is a production-ready, containerized energy forecasting and load-attribution engine. It uses a Linear Regression model with an **$R^2$ accuracy score of 94.95%** to predict daily electricity consumption (kWh), calculate financial operating costs, forecast carbon footprint impact, and trace real-time feature attribution impacts.
+An end-to-end machine learning platform for forecasting household electricity consumption using environmental and behavioral factors. Volterra transforms raw utility telemetry data into actionable intelligence, enabling predictive load management, cost projections, and carbon footprint tracking through a production-grade SaaS interface.
 
 ---
 
-## 📈 Platform Metrics & Coefficients
+## 📋 Project Overview
 
-The core predictive engine operates on weights optimized over historical load configurations:
-
-*   **Intercept (Baseline Constant)**: `0.4721`
-*   **Occupancy Coefficient**: `+8.0050` *(Primary driver)*
-*   **Weekend Profile Offset**: `+5.1341`
-*   **AC Operating Hour Coefficient**: `+4.4470`
-*   **Appliance Operating Hour Coefficient**: `+2.1748`
-*   **Temperature Coefficient**: `+1.8166`
-*   **Humidity Coefficient**: `+0.2958` *(Baseline driver)*
+Volterra is a production-ready predictive engine built to automate electricity consumption forecasting. Operating on optimized regression parameters, the engine ingests real-time inputs (such as local temperature, humidity, active occupant counts, and appliance runtimes) to output immediate daily load projections, cost estimations, and carbon impact metrics.
 
 ---
 
-## 📂 System Architecture
+## 💼 Business Problem
 
-```text
-smart-electricity-prediction/
-├── app/
-│   └── app.py                  # Volterra Streamlit analytics dashboard
-├── dataset/
-│   ├── processed/              # Preprocessed data splits
-│   └── electricity_consumption_3000.csv  # Raw load telemetry data
-├── models/
-│   └── linear_regression_model.pkl       # Serialized predictive weights
-├── notebooks/
-│   └── 1.0-eda-and-modeling.ipynb        # Data exploration and statistics
-├── reports/
-│   ├── figures/                # Visual distributions and correlations
-│   ├── model_results/          # Regression diagnostics plots
-│   └── portfolio_upgrade_audit.md # Portfolio alignment audit logs
-├── src/
-│   ├── __init__.py             # Package descriptor
-│   ├── data_preprocessing.py   # Preprocessing and partition pipeline
-│   └── train.py                # Regression training and diagnostics
-├── requirements.txt            # Package specifications
-└── LICENSE                     # MIT License
+Modern smart grids and domestic utility systems face challenges in load balancing and active conservation. Without forecasting capabilities, consumers and grid operators cannot:
+*   Identify peak demand intervals before they occur, leading to high utility bills.
+*   Quantify how specific behavioral changes (e.g., reducing AC runtimes by 1 hour) translate to direct cost savings.
+*   Correlate occupancy and appliance runtimes with daily carbon emissions.
+
+Volterra solves this by providing a white-box forecasting model that maps environmental and behavioral features directly to consumption metrics.
+
+---
+
+## 🏗️ Solution Architecture
+
+Volterra is structured as a modular, containerized application ready for production deployment:
+
+```mermaid
+graph TD
+    A["Raw Load Telemetry"] --> B["Preprocessing Pipeline (src/data_preprocessing.py)"]
+    B --> C["Train/Test Data Splits (dataset/processed/)"]
+    C --> D["Regression Training Engine (src/train.py)"]
+    D --> E["Serialized Weights (models/linear_regression_model.pkl)"]
+    E --> F["SaaS Dashboard (app/app.py)"]
+    F --> G["Docker Container (Hugging Face Spaces)"]
 ```
 
 ---
 
-## 🛠️ Deploying & Running Volterra Locally
+## 🚀 Key Features
 
-### 1. Prerequisite Packages
-Ensure Python 3.8+ is installed on your local host.
+*   **Real-time Load Simulator**: Interactive control panel to simulate environmental and appliance runtimes.
+*   **Predictive Financial Forecasts**: Calculates daily operational costs based on current load forecasts ($0.15/kWh baseline).
+*   **Carbon Footprint Tracking**: Projects daily CO₂ output (0.4kg CO₂/kWh emissions rate) to promote sustainability.
+*   **Dynamic Feature Attribution**: Interactive bar charts detailing active feature contributions ($Weight \times Input$) in real time.
+*   **Scenario Presets**: Sidebar load profiles (Peak Demand, Eco Conservation, Baseline Utility) for instant configuration.
 
-### 2. Dependency Setup
-Install required system packages:
+---
+
+## 📈 Model Performance & Parametrics
+
+The forecasting engine utilizes a Linear Regression model fitted over 3,000 telemetry samples:
+
+*   **R² Variance Score**: **94.95%** (High-predictive confidence on testing data)
+*   **Mean Absolute Error (MAE)**: **6.38 kWh**
+*   **Root Mean Squared Error (RMSE)**: **7.91 kWh**
+
+### Optimization Coefficients (Impact Weights)
+The model assigns the following coefficients to input variables (representing daily load shift in kWh per unit change):
+*   **Occupancy**: `+8.0050`
+*   **Weekend Profile**: `+5.1341`
+*   **AC Operating Hours**: `+4.4470`
+*   **Appliance Operating Hours**: `+2.1748`
+*   **Temperature**: `+1.8166`
+*   **Humidity**: `+0.2958`
+*   **Intercept (Baseline Constant)**: `0.4721`
+
+---
+
+## 🖼️ Dashboard Preview
+
+To view the screenshot mockups, concepts, and AI image prompts used to design this platform's visual interface, refer to [reports/screenshot_strategy.md](reports/screenshot_strategy.md).
+
+---
+
+## 💻 Tech Stack
+
+*   **Core Engine**: Python 3.10
+*   **Modeling & Training**: Scikit-Learn, Pandas, NumPy
+*   **Visualizations**: Seaborn, Matplotlib
+*   **SaaS Interface**: Streamlit
+*   **Containerization & Hosting**: Docker, Hugging Face Spaces
+
+---
+
+## 📂 Project Structure
+
+For a full directory tree detailing files and directories, see [PROJECT_STRUCTURE.md](PROJECT_STRUCTURE.md).
+
+---
+
+## 🛠️ Installation & Local Running
+
+### 1. Clone & Install Dependencies
 ```bash
+git clone https://github.com/ritesh-1918/smart-electricity-consumption-predictor.git
+cd smart-electricity-consumption-predictor
 pip install -r requirements.txt
 ```
 
-### 3. Initialize Preprocessing
-Run the telemetry partitioning pipeline to format arrays:
+### 2. Preprocess Dataset
 ```bash
 python src/data_preprocessing.py
 ```
 
-### 4. Train Prediction Engine
-Optimize feature attribution weights and write diagnostic reports:
+### 3. Execute Training Pipeline
 ```bash
 python src/train.py
 ```
 
-### 5. Launch Local Dashboard
-Serve the interactive analytics panel locally:
+### 4. Launch SaaS Dashboard
 ```bash
 python -m streamlit run app/app.py
 ```
-Open `http://localhost:8501` to access the simulator dashboard.
 
 ---
 
-## 🌐 Live Production Deployment
+## 🌐 Production Deployment
 
-Volterra is compiled and deployed live in production on **Hugging Face Spaces**:
-*   **Active Application URL**: [huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
+Volterra is compiled into a Docker container and hosted in production on Hugging Face Spaces.
+
+*   **Hugging Face Spaces URL**: [huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
 
 ---
 
-## 📄 License
-This codebase is distributed open-source under the terms of the [MIT License](LICENSE).
+## 🗺️ Future Roadmap
+
+*   **Regularization Tuning**: Incorporate Ridge and Lasso scaling to mitigate potential collinearity between humidity and temperature.
+*   **Multi-Model Comparison**: Add Decision Tree Regressor diagnostics to the backend.
+*   **InfluxDB Integration**: Connect telemetry inputs to a live InfluxDB stream for real-time household monitoring.
+
+---
+
+## 👤 Author
+*   **Developer**: [ritesh-1918](https://github.com/ritesh-1918)
