@@ -4,6 +4,3 @@ matplotlib
 seaborn
 scikit-learn
 streamlit
-nbformat
-nbconvert
-ipykernel
