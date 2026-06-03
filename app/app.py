@@ -21,6 +21,10 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+def clean_html(html_str):
+    return "\n".join([line.strip() for line in html_str.split("\n")])
+
+
 # Dark SaaS Design System (CSS Styles)
 st.markdown("""
 <style>
@@ -206,43 +210,43 @@ else:
         # Grid of premium KPI cards
         kpi_col1, kpi_col2 = st.columns(2)
         with kpi_col1:
-            st.markdown(f"""
+            st.markdown(clean_html(f"""
             <div class="kpi-container">
                 <div class="kpi-title">Forecasted Daily Load</div>
                 <div class="kpi-value">{predicted_load:.2f} kWh</div>
                 <div class="kpi-trend">Estimated Usage Rate</div>
             </div>
-            """, unsafe_allow_html=True)
+            """), unsafe_allow_html=True)
             
-            st.markdown(f"""
+            st.markdown(clean_html(f"""
             <div class="kpi-container">
                 <div class="kpi-title">Projected Operating Cost</div>
                 <div class="kpi-value" style="color: #F59E0B;">${estimated_cost:.2f}</div>
                 <div class="kpi-trend" style="color: #64748B;">Tariff: $0.15 / kWh</div>
             </div>
-            """, unsafe_allow_html=True)
+            """), unsafe_allow_html=True)
             
         with kpi_col2:
-            st.markdown(f"""
+            st.markdown(clean_html(f"""
             <div class="kpi-container">
                 <div class="kpi-title">Carbon Footprint Impact</div>
                 <div class="kpi-value" style="color: #3B82F6;">{estimated_emissions:.2f} kg</div>
                 <div class="kpi-trend" style="color: #64748B;">CO2 Equivalency Rate</div>
             </div>
-            """, unsafe_allow_html=True)
+            """), unsafe_allow_html=True)
             
             # Consumption Status
             is_critical = predicted_load > 180.0
             status_color = "#EF4444" if is_critical else "#10B981"
             status_text = "CRITICAL LIMIT EXCEEDED" if is_critical else "NOMINAL CAPACITY STATUS"
             
-            st.markdown(f"""
+            st.markdown(clean_html(f"""
             <div class="kpi-container">
                 <div class="kpi-title">Consumption Status</div>
                 <div class="kpi-value" style="color: {status_color}; font-size: 24px; padding-top: 8px;">{status_text}</div>
                 <div class="kpi-trend" style="color: #64748B;">Threshold Limit: 180 kWh</div>
             </div>
-            """, unsafe_allow_html=True)
+            """), unsafe_allow_html=True)
 
     # Key Drivers & Interpretability
     st.markdown('<div class="section-header">Key Drivers & Attribution Analysis</div>', unsafe_allow_html=True)
@@ -281,7 +285,7 @@ else:
             </div>
             """
             
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div style="background-color: #121620; border: 1px solid #1E293B; border-radius: 6px; padding: 20px; min-height: 275px; display: flex; flex-direction: column; justify-content: space-between;">
             <div>
                 <div style="font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 15px;">
@@ -290,7 +294,7 @@ else:
                 {bar_html}
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
         
     with col_driver2:
         st.write("##### Optimization Recommendations")
@@ -317,7 +321,7 @@ else:
         alert_text = "#FECACA" if is_critical else "#A7F3D0"
         alert_msg = "💡 High power load detected. Apply recommendations:" if is_critical else "💡 Consumption loads stable. Optimization tips:"
         
-        st.markdown(f"""
+        st.markdown(clean_html(f"""
         <div style="background-color: #121620; border: 1px solid #1E293B; border-radius: 6px; padding: 20px; min-height: 275px; display: flex; flex-direction: column; justify-content: flex-start;">
             <div>
                 <div style="background-color: {alert_bg}; border: 1px solid {alert_border}; color: {alert_text}; padding: 10px 14px; border-radius: 4px; font-size: 13px; font-weight: 500; margin-bottom: 15px;">
@@ -328,7 +332,7 @@ else:
                 </ul>
             </div>
         </div>
-        """, unsafe_allow_html=True)
+        """), unsafe_allow_html=True)
 
     # Model Insights & Diagnostics
     st.markdown('<div class="section-header">Predictive Engine Diagnostics</div>', unsafe_allow_html=True)
