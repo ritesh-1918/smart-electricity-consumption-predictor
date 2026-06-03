@@ -1,8 +1,18 @@
+---
+title: Smart Electricity Consumption Predictor
+emoji: ⚡
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # ⚡ Smart Electricity Consumption Predictor
 
 [![License: MIT](https://img.shields.Format/badge/License-MIT-blue.svg)](LICENSE)
 [![Python Version](https://img.shields.Format/badge/Python-3.8%2B-blue)](requirements.txt)
-[![Streamlit App](https://img.shields.Format/badge/Streamlit-App-brightgreen)](app/app.py)
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
 [![R2 Accuracy](https://img.shields.Format/badge/Model%20Accuracy%20(R2)-94.95%25-neon)](src/train.py)
 
 > **"Demystifying Machine Learning Predictions, One Equation at a Time."**
@@ -100,6 +110,11 @@ Open `http://localhost:8501` to view your dashboard.
 - [ ] Add Ridge & Lasso regularization support for teaching.
 - [ ] Add comparative metrics tab (Linear Regression vs. Decision Trees).
 - [ ] Integrate database storage to save prediction logs.
+
+## 🌐 Live Production Deployment
+
+This application is deployed live in production on **Hugging Face Spaces**:
+*   **Production App URL**: [huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
 
 ---
 
