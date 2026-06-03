@@ -165,7 +165,12 @@ else:
         st.markdown("---")
         st.subheader("🔬 Model Interpretability Suite")
         
-        tab1, tab2, tab3 = st.tabs(["💡 Live Equation Solver", "📊 Feature Weights (Coefficients)", "📈 Live Feature Contributions"])
+        tab1, tab2, tab3, tab4 = st.tabs([
+            "💡 Live Equation Solver", 
+            "📊 Feature Weights (Coefficients)", 
+            "📈 Live Feature Contributions",
+            "🔍 Exploratory Data Analysis (EDA)"
+        ])
         
         with tab1:
             st.markdown("""
@@ -251,6 +256,47 @@ Electricity Consumption = {model.intercept_:.4f}
             
             st.pyplot(fig2)
             st.caption("Contribution is calculated as: learned coefficient weight multiplied by your slider input value. This allows you to inspect what is driving the active prediction.")
+            
+        with tab4:
+            st.markdown("### 📊 Dataset Exploratory Analysis (EDA)")
+            st.write("These visualizations are generated during data exploration in our notebooks and saved into our reports directory:")
+            
+            figures_dir = os.path.join(os.path.dirname(__file__), "..", "reports", "figures")
+            
+            # Load images
+            target_dist_path = os.path.join(figures_dir, "target_distribution.png")
+            heatmap_path = os.path.join(figures_dir, "correlation_heatmap.png")
+            histograms_path = os.path.join(figures_dir, "histograms.png")
+            boxplots_path = os.path.join(figures_dir, "boxplots.png")
+            
+            col_eda1, col_eda2 = st.columns(2)
+            with col_eda1:
+                if os.path.exists(target_dist_path):
+                    st.image(target_dist_path, caption="1. Distribution of Target (Electricity Consumption)")
+                if os.path.exists(histograms_path):
+                    st.image(histograms_path, caption="2. Histograms of Numerical Features")
+            with col_eda2:
+                if os.path.exists(heatmap_path):
+                    st.image(heatmap_path, caption="3. Feature Correlation Heatmap")
+                if os.path.exists(boxplots_path):
+                    st.image(boxplots_path, caption="4. Boxplots for Outlier Analysis")
+                    
+            st.markdown("#### 🔄 Feature Bivariate Relationships")
+            col_eda3, col_eda4 = st.columns(2)
+            with col_eda3:
+                temp_vs_path = os.path.join(figures_dir, "temp_vs_consumption.png")
+                if os.path.exists(temp_vs_path):
+                    st.image(temp_vs_path, caption="5. Outdoor Temperature vs. Consumption")
+                occupancy_vs_path = os.path.join(figures_dir, "occupancy_vs_consumption.png")
+                if os.path.exists(occupancy_vs_path):
+                    st.image(occupancy_vs_path, caption="6. Household Occupancy vs. Consumption")
+            with col_eda4:
+                ac_vs_path = os.path.join(figures_dir, "ac_hours_vs_consumption.png")
+                if os.path.exists(ac_vs_path):
+                    st.image(ac_vs_path, caption="7. Air Conditioner Active Hours vs. Consumption")
+                app_vs_path = os.path.join(figures_dir, "appliance_hours_vs_consumption.png")
+                if os.path.exists(app_vs_path):
+                    st.image(app_vs_path, caption="8. Appliance Active Hours vs. Consumption")
             
     else:
         # Standard User Mode Recommendations
