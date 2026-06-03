@@ -5,6 +5,12 @@ Production energy forecast, carbon tracking, and feature attribution dashboard.
 Provides clean UI layout metrics and analytics insights.
 """
 
+# =====================================
+# SYSTEM DEPENDENCIES & LIBRARIES
+# =====================================
+# Streamlit: A web-framework for Python to build interactive dashboards quickly.
+# Pandas & NumPy: Structured data processing and numeric helpers.
+# Pickle & OS: Save/load operations and system filepath access.
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,7 +19,10 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# Page configurations
+# =====================================
+# DASHBOARD PAGE CONFIGURATION
+# =====================================
+# st.set_page_config sets the browser window title, sidebar state, and uses a wide layout grid.
 st.set_page_config(
     page_title="Volterra | Energy Intelligence",
     page_icon="⚡",
@@ -21,11 +30,17 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Helper function to remove leading spaces from multi-line HTML strings.
+# This prevents Streamlit's markdown parser from rendering HTML as a raw text code block.
 def clean_html(html_str):
     return "\n".join([line.strip() for line in html_str.split("\n")])
 
-
-# Dark SaaS Design System (CSS Styles)
+# =====================================
+# PREMIUM DARK SAAS DESIGN THEME (CSS)
+# =====================================
+# Custom CSS stylesheets injected into the page to override default Streamlit themes.
+# Styles the background to deep blue-black (#0B0E14), makes borders slate (#1E293B),
+# and establishes the premium SaaS visual hierarchy for cards and dividers.
 st.markdown("""
 <style>
     /* Main container background overrides */
@@ -96,11 +111,19 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Load trained regression weights
+# =====================================
+# LOADING THE TRAINED MODEL (INFRASTRUCTURE)
+# =====================================
+# Path to the serialized model file.
 MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "linear_regression_model.pkl")
 
+# @st.cache_resource tells Streamlit to load the model file once and keep it in cache memory.
+# This prevents reloading the model from disk on every page refresh or slider adjustment.
 @st.cache_resource
 def get_prediction_engine(path):
+    # Instead of training the model on the fly (which takes time and computational resources),
+    # we load our pre-compiled 'pickle' model. This contains the pre-learned mathematical formulas,
+    # allowing us to generate predictions in milliseconds!
     if not os.path.exists(path):
         return None
     try:
@@ -110,16 +133,20 @@ def get_prediction_engine(path):
     except Exception:
         return None
 
+# Instantiating our predictor engine.
 engine = get_prediction_engine(MODEL_PATH)
 
-# Sidebar - Settings and Simulation Presets only
+# =====================================
+# SIDEBAR CONTROL PANEL
+# =====================================
 st.sidebar.markdown("### ⚙️ Simulation Settings")
+# Selectbox allows users to test preconfigured energy demand scenarios.
 preset = st.sidebar.selectbox(
     "Select Load Profile Preset",
     options=["Manual Configuration", "Peak Demand Profile", "Eco Conservation Profile", "Baseline Utility Profile"]
 )
 
-# Preset configs mapping
+# Preset configs mapping sets default values for inputs based on user's selection.
 if preset == "Peak Demand Profile":
     val_temp = 42.0
     val_humidity = 70.0
@@ -142,6 +169,7 @@ elif preset == "Baseline Utility Profile":
     val_appliance = 3.0
     val_day = "Weekday"
 else:
+    # Default settings
     val_temp = 26.0
     val_humidity = 55.0
     val_occupants = 4
@@ -171,12 +199,14 @@ st.markdown("""
 if engine is None:
     st.error("Error: Core prediction binary linear_regression_model.pkl is missing. Please run src/train.py to compile.")
 else:
-    # Split Simulator inputs and live output predictions
+    # Split Simulator inputs (left column) and live predictions (right column)
     col_input, col_display = st.columns([1, 1])
     
     with col_input:
         st.markdown('<div class="section-header">Simulated Input Parameters</div>', unsafe_allow_html=True)
         
+        # Grid of sliders to collect input features from the user.
+        # Streamlit sliders capture real-time values for Temperature, Humidity, Occupancy, AC, and Appliance hours.
         inp_col1, inp_col2 = st.columns(2)
         with inp_col1:
             temperature = st.slider("Outdoor Temperature (°C)", 10.0, 50.0, val_temp, 0.5)
@@ -187,10 +217,17 @@ else:
             appliance_hours = st.slider("Appliance Operating Hours (daily)", 0.0, 24.0, val_appliance, 0.5)
             day_type = st.selectbox("Day Classification", ["Weekday", "Weekend"], index=0 if val_day == "Weekday" else 1)
             
-    # Map day classification
+    # Map day classification (Categorical Variable Encoding)
+    # Weekday -> 0, Weekend -> 1 (identical mapping logic used during model training).
     day_encoded = 0 if day_type == "Weekday" else 1
     
-    # Predict output calculations
+    # =====================================
+    # STREAMLIT PREDICTION PIPELINE
+    # =====================================
+    # Preparing Features for the Model:
+    # Machine Learning models expect inputs in a specific structure, matching the exact format
+    # they were trained on (columns, scale, order). Here, we take the user's slider/input choices
+    # and organize them into a 1-row Pandas DataFrame to feed into the prediction engine.
     input_df = pd.DataFrame([{
         'Temperature': temperature,
         'Humidity': humidity,
@@ -200,9 +237,15 @@ else:
         'Day_Type': day_encoded
     }])
     
+    # Running Model Inference (Prediction):
+    # We call engine.predict() which executes the regression equation using the loaded weights:
+    # predicted_load = Intercept + w1*Temp + w2*Humidity + w3*Occupancy + w4*AC_Hours + w5*Appliance_Hours + w6*Day_Type.
+    # The output is the forecasted continuous target value (electricity consumption in kWh).
     predicted_load = engine.predict(input_df)[0]
-    estimated_cost = predicted_load * 0.15
-    estimated_emissions = predicted_load * 0.4
+    
+    # Estimates derived from forecasted consumption (kWh).
+    estimated_cost = predicted_load * 0.15      # Cost estimate ($0.15 per kWh)
+    estimated_emissions = predicted_load * 0.4  # Carbon footprint (0.4 kg CO2 per kWh)
     
     with col_display:
         st.markdown('<div class="section-header">Energy Forecast Metrics</div>', unsafe_allow_html=True)
@@ -235,7 +278,7 @@ else:
             </div>
             """), unsafe_allow_html=True)
             
-            # Consumption Status
+            # Consumption Threshold Limit Check
             is_critical = predicted_load > 180.0
             status_color = "#EF4444" if is_critical else "#10B981"
             status_text = "CRITICAL LIMIT EXCEEDED" if is_critical else "NOMINAL CAPACITY STATUS"
@@ -256,7 +299,13 @@ else:
     with col_driver1:
         st.write("##### Real-Time Feature Attribution")
         
-        # Calculate impact values
+        # =====================================
+        # FEATURE ATTRIBUTION (XAI)
+        # =====================================
+        # Calculating Feature Attribution (Key Drivers):
+        # We multiply each input value by its learned coefficient (weight) from the trained model.
+        # This shows us exactly how many kWh each feature contributed to the final forecast.
+        # It explains *why* the model predicted a particular load, making the AI explainable (XAI).
         impacts = [
             ('Outdoor Temperature', engine.coef_[0] * temperature),
             ('Relative Humidity', engine.coef_[1] * humidity),
@@ -265,12 +314,13 @@ else:
             ('Appliance Operating Hours', engine.coef_[4] * appliance_hours),
             ('Day Type Classification', engine.coef_[5] * day_encoded)
         ]
-        # Sort by impact value descending
+        # Sort features so the highest contributing driver shows up first.
         impacts = sorted(impacts, key=lambda x: x[1], reverse=True)
         
         bar_html = ""
         max_val = 110.0  # Scale against maximum potential single feature impact
         
+        # Build custom CSS progress bars to visualize feature attribution
         for label, val in impacts:
             pct = min(100.0, max(0.0, (val / max_val) * 100))
             bar_html += f"""
@@ -299,6 +349,7 @@ else:
     with col_driver2:
         st.write("##### Optimization Recommendations")
         
+        # Generate operational recommendations based on slider thresholds.
         rec_list = []
         if ac_hours > 6.0:
             rec_list.append(f"Decrease active AC cooling by 1 hour to reduce demand by <b>{engine.coef_[3]:.2f} kWh</b>.")
@@ -334,7 +385,7 @@ else:
         </div>
         """), unsafe_allow_html=True)
 
-    # Model Insights & Diagnostics
+    # Model Insights & Diagnostics (Tabs at bottom of dashboard)
     st.markdown('<div class="section-header">Predictive Engine Diagnostics</div>', unsafe_allow_html=True)
     
     tab_inspect1, tab_inspect2 = st.tabs(["🧬 Model Parameter Metrics", "📈 Historical Exploration Charts"])
