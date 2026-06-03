@@ -130,11 +130,32 @@ python -m streamlit run app/app.py
 
 ---
 
-## 🌐 Production Deployment
+## 🌐 Live Production Deployment
 
-Volterra is compiled into a Docker container and hosted in production on Hugging Face Spaces.
+This application is deployed live in production on **Hugging Face Spaces**:
+*   **Production App URL**: [huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
 
-*   **Hugging Face Spaces URL**: [huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
+---
+
+## 📂 Workshop Resources Hub
+
+For participants of our live energy forecasting session, all deliverables and roadmaps are compiled here:
+
+*   **[WORKSHOP_RESOURCES.md](resources/WORKSHOP_RESOURCES.md)**: Main Deliverables Handoff Hub
+*   **[LEARNING_PATH.md](resources/LEARNING_PATH.md)**: Next Steps Machine Learning Roadmap
+*   **[PROJECT_OVERVIEW.md](resources/PROJECT_OVERVIEW.md)**: Mathematical Solver and Data Architecture Details
+*   **[FAQ.md](resources/FAQ.md)**: Frequently Asked Questions & Resolution Guide
+*   **[FUTURE_PROJECTS.md](resources/FUTURE_PROJECTS.md)**: Subsequent Portfolio Projects list
+*   **[RESOURCES.md](resources/RESOURCES.md)**: Free Online Books, Courses, and Docs
+
+*If you'd like access to future AI, ML, IoT and open-source projects, you can follow my GitHub profile.*
+
+*If this project helped you, consider starring the repository. It helps me continue publishing more projects.*
+
+---
+
+## 📄 License
+This project is open-source and licensed under the [MIT License](LICENSE).
 
 ---
 
