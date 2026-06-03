@@ -151,16 +151,15 @@ if __name__ == "__main__":
             print(f"  - {col:18} : {coef:+.4f}")
         print("="*50)
         
-        # Beginner explanations
+        # Model attribution explanations
         print("\n" + "#"*60)
-        print("BEGINNER-FRIENDLY MACHINE LEARNING EXPLANATIONS")
+        print("MODEL FORECAST ATTRIBUTION & INTERPRETABILITY")
         print("#"*60)
         print("""
-1. What did our Linear Regression model learn?
-   Our Linear Regression model learned a straight-line mathematical formula to predict
-   Electricity Consumption based on our features:
+1. Model Attribution Target:
+   The regression engine optimizes linear weights to predict consumption from inputs:
    
-   Electricity_Consumption = (Intercept) 
+   Electricity_Consumption = Intercept 
                              + (w1 * Temperature) 
                              + (w2 * Humidity) 
                              + (w3 * Occupancy) 
@@ -168,25 +167,21 @@ if __name__ == "__main__":
                              + (w5 * Appliance_Hours) 
                              + (w6 * Day_Type)
 
-2. What do the Coefficients mean?
-   Coefficients represent the slope or 'weight' of each feature. They tell us how much
-   Electricity Consumption changes for every 1-unit increase in that feature, holding
-   all other features constant.
-   - A POSITIVE coefficient (+) means as the feature increases, consumption increases.
-   - A NEGATIVE coefficient (-) means as the feature increases, consumption decreases.
-   - The larger the absolute number, the more influential that feature is.
+2. Attribution Coefficients (Slopes):
+   Coefficients represent the change in forecasted electricity consumption (kWh) 
+   per unit increase in a feature, holding all other features constant.
+   - Positive coefficients (+) indicate a direct relationship (raising the feature increases load).
+   - Negative coefficients (-) indicate an inverse relationship.
+   - Absolute weight values indicate feature influence hierarchy.
 
-3. What is the R-squared (R2) Score?
-   R2 measures the proportion of variance in the target variable that is predictable
-   from the features. 
-   - An R2 of 1.0 (100%) represents a perfect model that makes no mistakes.
-   - An R2 of 0.85 means our model can explain 85% of the differences in electricity
-     consumption using the 6 features provided, which is exceptionally high!
+3. R-squared (R2) Variance Score:
+   R2 measures the proportion of variance in the target variable explained by model features.
+   - An R2 score of 0.9495 means that 94.95% of target variance is explained by the model, 
+     indicating a highly predictive fit.
 
-4. Why are our predictions not 100% accurate?
-   In real life and modeling, there is always random noise (unmeasured factors like individual
-   habits, different efficiency ratings of appliances, or sudden weather changes). Since the
-   model cannot see these unmeasured variables, it cannot predict them perfectly.
+4. Unmodeled Variance (Residuals):
+   Real-world loads exhibit minor stochastic variations (e.g. appliance model differences, occupant habits)
+   which are treated as unmodeled residual errors, establishing the boundary of model certainty.
         """)
         print("#"*60 + "\n")
         

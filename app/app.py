@@ -1,9 +1,9 @@
 """
-Streamlit Web App (Option A: Smart Electricity Predictor)
----------------------------------------------------------
-This script provides a workshop-grade, highly interactive dashboard that allows B.Tech 
-students to study how a Linear Regression model calculates electricity consumption.
-It highlights the intercept, slopes, and feature relationships in an educational format.
+Volterra: Intelligent Energy Analytics Engine
+---------------------------------------------
+This script serves as the interactive dashboard for Volterra, a forecasting
+and attribution platform predicting daily electricity consumption, projected costs,
+carbon emissions, and feature attribution impacts.
 """
 
 import streamlit as st
@@ -16,39 +16,41 @@ import seaborn as sns
 
 # Set page configurations
 st.set_page_config(
-    page_title="Smart Electricity Predictor",
+    page_title="Volterra Energy Analytics",
     page_icon="⚡",
     layout="wide"
 )
 
-# Custom css styling to simulate premium developer environment
+# Custom css styling to simulate premium SaaS dashboard
 st.markdown("""
 <style>
     .metric-card {
-        background-color: #1A1D24;
-        border: 2px solid #00F2FE;
-        border-radius: 10px;
-        padding: 20px;
+        background-color: #161A22;
+        border: 1px solid #1E293B;
+        border-radius: 8px;
+        padding: 18px;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
     }
     .metric-value {
-        font-size: 54px;
+        font-size: 38px;
         font-weight: bold;
-        color: #00F2FE;
-        margin: 10px 0px;
+        color: #10B981;
+        margin: 5px 0px;
     }
     .metric-label {
-        font-size: 14px;
-        color: #8A99AD;
+        font-size: 12px;
+        color: #94A3B8;
         text-transform: uppercase;
-        letter-spacing: 1.5px;
+        letter-spacing: 1px;
+        font-weight: 600;
     }
     .warning-card {
-        border-color: #FF6B6B !important;
+        border-color: #EF4444 !important;
     }
     .warning-value {
-        color: #FF6B6B !important;
+        color: #EF4444 !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -61,71 +63,99 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), "..", "models", "linear_reg
 def load_trained_model(path):
     if not os.path.exists(path):
         return None
-    with open(path, 'rb') as f:
-        model = pickle.load(f)
-    return model
+    try:
+        with open(path, 'rb') as f:
+            model = pickle.load(f)
+        return model
+    except Exception as e:
+        st.warning(f"Failed to deserialize model file: {e}")
+        return None
 
 model = load_trained_model(MODEL_PATH)
 
-# Sidebar with Educational content for B.Tech workshops
-st.sidebar.title("📚 Workshop Syllabus")
-st.sidebar.markdown("""
-### Core Concepts
-1. **Supervised Learning**
-   The training dataset contains both inputs and correct label outputs. The model learns to map input patterns to target outputs.
-2. **Regression**
-   Predicting a continuous numerical quantity (like electricity load in kWh).
-3. **Linear Regression**
-   Fits a straight hyperplane to minimize prediction error.
-   
-$$y = \\beta_0 + \\sum_{i=1}^{n} \\beta_i X_i$$
+# Sidebar with Platform Specs and Scenario Presets
+st.sidebar.title("⚡ Volterra Control Console")
 
-* **$\\beta_0$**: Intercept (baseline constant).
-* **$\\beta_i$**: Coefficients (slopes).
-* **$X_i$**: Input variables.
+st.sidebar.subheader("Presets")
+scenario = st.sidebar.selectbox(
+    "Load Profile Preset",
+    options=["Manual Override", "Peak Summer Load", "Baseline Load", "Eco Mode"]
+)
+
+# Defaults mapping
+if scenario == "Peak Summer Load":
+    d_temp = 42.0
+    d_humidity = 70.0
+    d_occupancy = 5
+    d_ac = 12.0
+    d_appliance = 10.0
+    d_day = "Weekend"
+elif scenario == "Baseline Load":
+    d_temp = 20.0
+    d_humidity = 40.0
+    d_occupancy = 2
+    d_ac = 0.0
+    d_appliance = 3.0
+    d_day = "Weekday"
+elif scenario == "Eco Mode":
+    d_temp = 24.0
+    d_humidity = 50.0
+    d_occupancy = 3
+    d_ac = 2.0
+    d_appliance = 4.0
+    d_day = "Weekday"
+else:
+    # Manual
+    d_temp = 25.0
+    d_humidity = 50.0
+    d_occupancy = 3
+    d_ac = 4.0
+    d_appliance = 6.0
+    d_day = "Weekday"
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("Platform Specifications")
+st.sidebar.markdown(f"""
+*   **Engine Core**: Linear Regression v1.0
+*   **Model Accuracy ($R^2$)**: `94.95%`
+*   **Mean Absolute Error**: `6.38 kWh`
+*   **Baseline Tariff**: `$0.15 / kWh`
+*   **Emissions Rate**: `0.4 kg CO2 / kWh`
 """)
 
 # Header section
-st.title("⚡ SMART ELECTRICITY PREDICTOR")
+st.title("⚡ VOLTERRA: INTELLIGENT ENERGY ANALYTICS ENGINE")
 st.markdown("""
-*Production Server: v1.0.4* &nbsp;•&nbsp; **Model Accuracy ($R^2$): 94.95%** &nbsp;•&nbsp; **Algorithm: Linear Regression**
+*Volterra analyzes real-time environment variables and appliance statistics to forecast household electricity consumption and calculate feature attribution impacts.*
 """)
 
-# Switch modes
-mode = st.radio(
-    "Select Display Mode:",
-    options=["🎓 Workshop Demo Mode", "📱 Standard User App"],
-    horizontal=True,
-    help="Demo Mode displays the live math equation solver and feature weights."
-)
-
 if model is None:
-    st.error("⚠️ Trained model file `linear_regression_model.pkl` was not found in the `models/` directory. Please run the training script `src/train.py` first to generate it.")
+    st.error("⚠️ Volterra prediction engine core was not found. Please verify that the training script `src/train.py` was executed successfully.")
 else:
     # 2-Column layout for inputs
     st.markdown("---")
-    st.subheader("🎛️ Live Parameter Simulator")
+    st.subheader("📊 Load Simulator")
     
     col1, col2 = st.columns(2)
     
     with col1:
         st.write("##### 🌡️ Environmental Metrics")
-        temperature = st.slider("Temperature (°C)", min_value=10.0, max_value=50.0, value=25.0, step=0.5)
-        humidity = st.slider("Humidity (%)", min_value=10.0, max_value=100.0, value=50.0, step=1.0)
-        occupancy = st.slider("Occupancy (Number of active occupants)", min_value=1, max_value=10, value=3, step=1)
+        temperature = st.slider("Temperature (°C)", min_value=10.0, max_value=50.0, value=d_temp, step=0.5)
+        humidity = st.slider("Humidity (%)", min_value=10.0, max_value=100.0, value=d_humidity, step=1.0)
+        occupancy = st.slider("Occupancy (Active Occupants)", min_value=1, max_value=10, value=d_occupancy, step=1)
         
     with col2:
-        st.write("##### 🔌 Appliance Activity profiles")
-        ac_hours = st.slider("AC Active Hours (per day)", min_value=0.0, max_value=24.0, value=4.0, step=0.5)
-        appliance_hours = st.slider("Appliance Active Hours (per day)", min_value=0.0, max_value=24.0, value=6.0, step=0.5)
-        day_type = st.segmented_control("Day Type Profile", options=["Weekday", "Weekend"], default="Weekday")
+        st.write("##### 🔌 Appliance Activity Profiles")
+        ac_hours = st.slider("AC Operating Hours (daily)", min_value=0.0, max_value=24.0, value=d_ac, step=0.5)
+        appliance_hours = st.slider("Appliance Operating Hours (daily)", min_value=0.0, max_value=24.0, value=d_appliance, step=0.5)
+        day_type = st.segmented_control("Day Type Profile", options=["Weekday", "Weekend"], default=d_day)
         
     # Process Day Type mapping
     day_type_encoded = 0 if day_type == "Weekday" else 1
     
     # Input validation alert
     if ac_hours + appliance_hours > 24.0:
-        st.warning("⚠️ Combined AC and appliance hours exceed 24 hours. The model will extrapolate predictions.")
+        st.warning("⚠️ High Load Alert: Combined AC and appliance operating time exceeds 24 hours.")
 
     # Format input row
     input_row = pd.DataFrame([{
@@ -140,45 +170,127 @@ else:
     # Run prediction
     prediction = model.predict(input_row)[0]
     
+    # Financial and Ecological projections
+    operating_cost = prediction * 0.15
+    carbon_emissions = prediction * 0.4
+    
     # Define threshold warning
     is_high_load = prediction > 180.0
     card_class = "metric-card warning-card" if is_high_load else "metric-card"
-    value_class = "metric-value warning-value" if is_high_load else "metric-value"
-    status_label = "🚨 HIGH LOAD ALERT" if is_high_load else "🟢 NORMAL CONSUMPTION"
+    val_class = "metric-value warning-value" if is_high_load else "metric-value"
+    status_label = "🚨 CRITICAL LOAD EXCEEDED" if is_high_load else "🟢 NOMINAL LOAD PROFILE"
     
-    # 3. Hero Element (Prediction Card)
+    # Hero KPI Grid (3 Columns)
     st.markdown("---")
-    st.markdown(f"""
-    <div class="{card_class}">
-        <div class="metric-label">Estimated Household Load</div>
-        <div class="{value_class}">{prediction:.2f} kWh</div>
-        <div style="font-weight: bold; margin-top: 5px;">Status: {status_label}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    kpi_col1, kpi_col2, kpi_col3 = st.columns(3)
     
-    # Demand indicator bar (visual gauge)
-    progress_val = min(max((prediction - 50) / 200, 0.0), 1.0)
-    st.progress(progress_val, text=f"Total Capacity Usage (scaled 50 kWh to 250 kWh)")
+    with kpi_col1:
+        st.markdown(f"""
+        <div class="{card_class}">
+            <div class="metric-label">Forecasted Daily Load</div>
+            <div class="{val_class}">{prediction:.2f} kWh</div>
+            <div style="font-size: 11px; font-weight: bold; margin-top: 5px;">{status_label}</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with kpi_col2:
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-label">Estimated Operating Cost</div>
+            <div class="metric-value" style="color: #F59E0B;">${operating_cost:.2f}</div>
+            <div style="font-size: 11px; color: #64748B; font-weight: bold; margin-top: 5px;">TARIFF: $0.15 / kWh</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
+    with kpi_col3:
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-label">Projected Carbon Footprint</div>
+            <div class="metric-value" style="color: #6366F1;">{carbon_emissions:.2f} kg</div>
+            <div style="font-size: 11px; color: #64748B; font-weight: bold; margin-top: 5px;">0.4 kg CO2 / kWh RATE</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    # 4. Interactive Interpretability Tabs (Explainable AI)
-    if mode == "🎓 Workshop Demo Mode":
-        st.markdown("---")
-        st.subheader("🔬 Model Interpretability Suite")
+    # Capacity bar
+    progress_val = min(max((prediction - 50) / 200, 0.0), 1.0)
+    st.progress(progress_val, text="Total Simulation Load Factor (scaled 50 kWh - 250 kWh)")
+
+    # Interpretability suite
+    st.markdown("---")
+    st.subheader("🔬 Attribution & Performance Suite")
+    
+    tab1, tab2, tab3, tab4 = st.tabs([
+        "📊 Dynamic Attribution Impact",
+        "📈 Feature Attribution Coefficients",
+        "💡 Diagnostics Engine Mechanics",
+        "🔍 Historical Data Insights"
+    ])
+    
+    with tab1:
+        st.markdown("##### Real-Time Feature Attribution ($Weight \\times Input\\_Value$):")
         
-        tab1, tab2, tab3, tab4 = st.tabs([
-            "💡 Live Equation Solver", 
-            "📊 Feature Weights (Coefficients)", 
-            "📈 Live Feature Contributions",
-            "🔍 Exploratory Data Analysis (EDA)"
-        ])
+        contrib_df = pd.DataFrame({
+            'Feature': ['Temperature', 'Humidity', 'Occupancy', 'AC_Hours', 'Appliance_Hours', 'Day_Type'],
+            'Contribution (kWh)': [
+                model.coef_[0] * temperature,
+                model.coef_[1] * humidity,
+                model.coef_[2] * occupancy,
+                model.coef_[3] * ac_hours,
+                model.coef_[4] * appliance_hours,
+                model.coef_[5] * day_type_encoded
+            ]
+        }).sort_values(by='Contribution (kWh)', ascending=True)
         
-        with tab1:
-            st.markdown("""
-            **How the model computed this value:**
-            Linear Regression multiplies each input feature by its learned coefficient (slope), then adds the intercept (baseline constant).
-            """)
-            
-            st.code(f"""
+        fig2, ax2 = plt.subplots(figsize=(6, 3))
+        sns.barplot(
+            x='Contribution (kWh)', 
+            y='Feature', 
+            data=contrib_df, 
+            hue='Feature',
+            palette='viridis', 
+            legend=False,
+            ax=ax2
+        )
+        ax2.set_title("Current Attribution Contribution to Forecast", fontsize=10)
+        ax2.set_xlabel("Contribution (kWh)", fontsize=8)
+        ax2.set_ylabel("")
+        plt.tight_layout()
+        
+        st.pyplot(fig2)
+        st.caption("Active feature contributions display exactly which inputs drive the current prediction calculation based on their coefficients.")
+        
+    with tab2:
+        st.markdown("##### Learned Attribution Coefficients:")
+        st.info("Attribution coefficients display the static weights computed by the model during training, representing impact per unit of change.")
+        
+        coef_df = pd.DataFrame({
+            'Feature': ['Temperature', 'Humidity', 'Occupancy', 'AC_Hours', 'Appliance_Hours', 'Day_Type'],
+            'Coefficient': model.coef_
+        }).sort_values(by='Coefficient', ascending=True)
+        
+        fig, ax = plt.subplots(figsize=(6, 3))
+        colors = ['#EF4444' if x < 1.0 else '#10B981' for x in coef_df['Coefficient']]
+        
+        sns.barplot(
+            x='Coefficient', 
+            y='Feature', 
+            data=coef_df, 
+            hue='Feature', 
+            palette=dict(zip(coef_df['Feature'], colors)), 
+            legend=False, 
+            ax=ax
+        )
+        ax.set_title("Attribution Weights per Unit Feature Increase", fontsize=10)
+        ax.set_xlabel("Coefficient Weight", fontsize=8)
+        ax.set_ylabel("")
+        plt.tight_layout()
+        
+        st.pyplot(fig)
+        st.caption("Slopes dictate the scale and direction of predicted load fluctuations when individual variables shift.")
+        
+    with tab3:
+        st.markdown("##### Attribution Equation Solver:")
+        st.code(f"""
 Electricity Consumption = Intercept + (w1 * Temp) + (w2 * Humidity) + (w3 * Occupancy) + (w4 * AC_Hours) + (w5 * Appliance_Hours) + (w6 * Day_Type)
 
 Inputs plugged in:
@@ -191,135 +303,48 @@ Electricity Consumption = {model.intercept_:.4f}
                         + ({model.coef_[5]:.4f} * {day_type_encoded})
                         
                         = {prediction:.2f} kWh
-            """, language="text")
-            
-        with tab2:
-            st.markdown("**Learned Feature Weights (Slopes):**")
-            st.info("Note: The coefficients/weights are the fixed mathematical parameters learned by the model during training. They do not change when you move the sliders.")
-            # Create a simple horizontal bar chart of coefficients
-            coef_df = pd.DataFrame({
-                'Feature': ['Temperature', 'Humidity', 'Occupancy', 'AC_Hours', 'Appliance_Hours', 'Day_Type'],
-                'Coefficient': model.coef_
-            }).sort_values(by='Coefficient', ascending=True)
-            
-            fig, ax = plt.subplots(figsize=(6, 3.5))
-            colors = ['#FF6B6B' if x < 1.0 else '#00F2FE' for x in coef_df['Coefficient']]
-            
-            # Using hue to suppress deprecation warning
-            sns.barplot(
-                x='Coefficient', 
-                y='Feature', 
-                data=coef_df, 
-                hue='Feature', 
-                palette=dict(zip(coef_df['Feature'], colors)), 
-                legend=False, 
-                ax=ax
-            )
-            ax.set_title("Feature Weights (Impact per Unit Change)", fontsize=10)
-            ax.set_xlabel("Coefficient Weight", fontsize=8)
-            ax.set_ylabel("")
-            plt.tight_layout()
-            
-            st.pyplot(fig)
-            st.caption("A positive weight indicates that increasing the feature value directly raises electricity consumption. The longer the bar, the larger the feature's influence.")
-            
-        with tab3:
-            st.markdown("**Real-Time Feature Contributions ($Weight \\times Input\\_Value$):**")
-            st.success("This chart updates in real-time as you move the sliders to show exactly which input is contributing the most to the current predicted consumption!")
-            
-            contrib_df = pd.DataFrame({
-                'Feature': ['Temperature', 'Humidity', 'Occupancy', 'AC_Hours', 'Appliance_Hours', 'Day_Type'],
-                'Contribution (kWh)': [
-                    model.coef_[0] * temperature,
-                    model.coef_[1] * humidity,
-                    model.coef_[2] * occupancy,
-                    model.coef_[3] * ac_hours,
-                    model.coef_[4] * appliance_hours,
-                    model.coef_[5] * day_type_encoded
-                ]
-            }).sort_values(by='Contribution (kWh)', ascending=True)
-            
-            fig2, ax2 = plt.subplots(figsize=(6, 3.5))
-            sns.barplot(
-                x='Contribution (kWh)', 
-                y='Feature', 
-                data=contrib_df, 
-                hue='Feature',
-                palette='viridis', 
-                legend=False,
-                ax=ax2
-            )
-            ax2.set_title("Current Feature Contributions to Prediction", fontsize=10)
-            ax2.set_xlabel("Contribution (kWh)", fontsize=8)
-            ax2.set_ylabel("")
-            plt.tight_layout()
-            
-            st.pyplot(fig2)
-            st.caption("Contribution is calculated as: learned coefficient weight multiplied by your slider input value. This allows you to inspect what is driving the active prediction.")
-            
-        with tab4:
-            st.markdown("### 📊 Dataset Exploratory Analysis (EDA)")
-            st.write("These visualizations are generated during data exploration in our notebooks and saved into our reports directory:")
-            
-            figures_dir = os.path.join(os.path.dirname(__file__), "..", "reports", "figures")
-            
-            # Load images
-            target_dist_path = os.path.join(figures_dir, "target_distribution.png")
-            heatmap_path = os.path.join(figures_dir, "correlation_heatmap.png")
-            histograms_path = os.path.join(figures_dir, "histograms.png")
-            boxplots_path = os.path.join(figures_dir, "boxplots.png")
-            
-            col_eda1, col_eda2 = st.columns(2)
-            with col_eda1:
-                if os.path.exists(target_dist_path):
-                    st.image(target_dist_path, caption="1. Distribution of Target (Electricity Consumption)")
-                if os.path.exists(histograms_path):
-                    st.image(histograms_path, caption="2. Histograms of Numerical Features")
-            with col_eda2:
-                if os.path.exists(heatmap_path):
-                    st.image(heatmap_path, caption="3. Feature Correlation Heatmap")
-                if os.path.exists(boxplots_path):
-                    st.image(boxplots_path, caption="4. Boxplots for Outlier Analysis")
-                    
-            st.markdown("#### 🔄 Feature Bivariate Relationships")
-            col_eda3, col_eda4 = st.columns(2)
-            with col_eda3:
-                temp_vs_path = os.path.join(figures_dir, "temp_vs_consumption.png")
-                if os.path.exists(temp_vs_path):
-                    st.image(temp_vs_path, caption="5. Outdoor Temperature vs. Consumption")
-                occupancy_vs_path = os.path.join(figures_dir, "occupancy_vs_consumption.png")
-                if os.path.exists(occupancy_vs_path):
-                    st.image(occupancy_vs_path, caption="6. Household Occupancy vs. Consumption")
-            with col_eda4:
-                ac_vs_path = os.path.join(figures_dir, "ac_hours_vs_consumption.png")
-                if os.path.exists(ac_vs_path):
-                    st.image(ac_vs_path, caption="7. Air Conditioner Active Hours vs. Consumption")
-                app_vs_path = os.path.join(figures_dir, "appliance_hours_vs_consumption.png")
-                if os.path.exists(app_vs_path):
-                    st.image(app_vs_path, caption="8. Appliance Active Hours vs. Consumption")
-            
-    else:
-        # Standard User Mode Recommendations
-        st.markdown("---")
-        st.subheader("💡 Energy Saving Recommendations")
+        """, language="text")
         
-        if is_high_load:
-            st.warning("⚠️ High daily energy load expected. Consider the following steps to save power:")
-        else:
-            st.info("ℹ️ Your household energy footprint is within normal limits. Keep it up! Here are minor optimization tips:")
-            
-        col1, col2 = st.columns(2)
-        with col1:
-            if ac_hours > 6.0:
-                st.write(f"- **AC Optimization**: Reducing AC active time by 1 hour saves ~**{model.coef_[3]:.2f} kWh**.")
-            if temperature > 32.0:
-                st.write("- **Ventilation**: Use fans instead of air conditioners when outdoor temperature permits.")
-        with col2:
-            if occupancy > 4:
-                st.write(f"- **Shared Load**: Coordinate household appliance usage during peak periods.")
-            if appliance_hours > 8.0:
-                st.write(f"- **Standby Power**: Unplug standby appliances to reduce base overhead load.")
+    with tab4:
+        st.markdown("##### Exploratory Data Analysis & Historical Distributions:")
+        
+        figures_dir = os.path.join(os.path.dirname(__file__), "..", "reports", "figures")
+        
+        # Load images
+        target_dist_path = os.path.join(figures_dir, "target_distribution.png")
+        heatmap_path = os.path.join(figures_dir, "correlation_heatmap.png")
+        histograms_path = os.path.join(figures_dir, "histograms.png")
+        boxplots_path = os.path.join(figures_dir, "boxplots.png")
+        
+        col_eda1, col_eda2 = st.columns(2)
+        with col_eda1:
+            if os.path.exists(target_dist_path):
+                st.image(target_dist_path, caption="Distribution of Electricity Consumption")
+            if os.path.exists(histograms_path):
+                st.image(histograms_path, caption="Histograms of Dataset Features")
+        with col_eda2:
+            if os.path.exists(heatmap_path):
+                st.image(heatmap_path, caption="Correlation Matrix Heatmap")
+            if os.path.exists(boxplots_path):
+                st.image(boxplots_path, caption="Boxplots (Outlier Checks)")
                 
+        st.markdown("##### Feature Interactions")
+        col_eda3, col_eda4 = st.columns(2)
+        with col_eda3:
+            temp_vs_path = os.path.join(figures_dir, "temp_vs_consumption.png")
+            if os.path.exists(temp_vs_path):
+                st.image(temp_vs_path, caption="Temperature vs. Consumption")
+            occupancy_vs_path = os.path.join(figures_dir, "occupancy_vs_consumption.png")
+            if os.path.exists(occupancy_vs_path):
+                st.image(occupancy_vs_path, caption="Occupancy vs. Consumption")
+        with col_eda4:
+            ac_vs_path = os.path.join(figures_dir, "ac_hours_vs_consumption.png")
+            if os.path.exists(ac_vs_path):
+                st.image(ac_vs_path, caption="AC Active Hours vs. Consumption")
+            app_vs_path = os.path.join(figures_dir, "appliance_hours_vs_consumption.png")
+            if os.path.exists(app_vs_path):
+                st.image(app_vs_path, caption="Appliance Active Hours vs. Consumption")
+
 # Footer info
 st.markdown("---")
-st.caption("Designed for B.Tech Machine Learning Workshops & Laboratory Demonstrations.")
+st.caption("Volterra Energy Analytics Engine • Powered by Scikit-Learn and Streamlit.")
