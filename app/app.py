@@ -34,10 +34,14 @@ st.markdown("""
         background-color: #121620;
         border: 1px solid #1E293B;
         border-radius: 6px;
-        padding: 20px;
+        padding: 16px 20px;
         text-align: left;
         box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         margin-bottom: 20px;
+        min-height: 135px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     .kpi-title {
         font-size: 11px;
@@ -243,57 +247,57 @@ else:
     # Key Drivers & Interpretability
     st.markdown('<div class="section-header">Key Drivers & Attribution Analysis</div>', unsafe_allow_html=True)
     
-    col_driver1, col_driver2 = st.columns([1.2, 1])
+    col_driver1, col_driver2 = st.columns([1, 1])
     
     with col_driver1:
         st.write("##### Real-Time Feature Attribution")
-        contrib_series = pd.DataFrame({
-            'Attribute': ['Temperature', 'Humidity', 'Occupancy', 'AC_Hours', 'Appliance_Hours', 'Day_Type'],
-            'Impact Value': [
-                engine.coef_[0] * temperature,
-                engine.coef_[1] * humidity,
-                engine.coef_[2] * occupants,
-                engine.coef_[3] * ac_hours,
-                engine.coef_[4] * appliance_hours,
-                engine.coef_[5] * day_encoded
-            ]
-        }).sort_values(by='Impact Value', ascending=True)
         
-        fig, ax = plt.subplots(figsize=(6, 3.2))
-        fig.patch.set_facecolor('#121620')
-        ax.set_facecolor('#121620')
+        # Calculate impact values
+        impacts = [
+            ('Outdoor Temperature', engine.coef_[0] * temperature),
+            ('Relative Humidity', engine.coef_[1] * humidity),
+            ('Occupant Count', engine.coef_[2] * occupants),
+            ('AC Operating Hours', engine.coef_[3] * ac_hours),
+            ('Appliance Operating Hours', engine.coef_[4] * appliance_hours),
+            ('Day Type Classification', engine.coef_[5] * day_encoded)
+        ]
+        # Sort by impact value descending
+        impacts = sorted(impacts, key=lambda x: x[1], reverse=True)
         
-        sns.barplot(
-            x='Impact Value',
-            y='Attribute',
-            data=contrib_series,
-            hue='Attribute',
-            palette='mako',
-            legend=False,
-            ax=ax
-        )
-        ax.set_title("Current Active Attribution Weightings (kWh)", fontsize=10, color='#F8FAFC')
-        ax.xaxis.label.set_color('#94A3B8')
-        ax.yaxis.label.set_color('#94A3B8')
-        ax.tick_params(colors='#94A3B8', labelsize=8)
-        ax.spines['bottom'].set_color('#1E293B')
-        ax.spines['left'].set_color('#1E293B')
-        ax.spines['top'].set_visible(False)
-        ax.spines['right'].set_visible(False)
-        plt.tight_layout()
-        st.pyplot(fig)
+        bar_html = ""
+        max_val = 110.0  # Scale against maximum potential single feature impact
+        
+        for label, val in impacts:
+            pct = min(100.0, max(0.0, (val / max_val) * 100))
+            bar_html += f"""
+            <div style="margin-bottom: 12px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 12px;">
+                    <span style="color: #94A3B8; font-weight: 500;">{label}</span>
+                    <span style="color: #F8FAFC; font-weight: 600;">{val:.2f} kWh</span>
+                </div>
+                <div style="background-color: #1E293B; height: 6px; border-radius: 3px; overflow: hidden; width: 100%;">
+                    <div style="background: linear-gradient(90deg, #3B82F6 0%, #10B981 100%); width: {pct:.1f}%; height: 100%; border-radius: 3px;"></div>
+                </div>
+            </div>
+            """
+            
+        st.markdown(f"""
+        <div style="background-color: #121620; border: 1px solid #1E293B; border-radius: 6px; padding: 20px; min-height: 275px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="font-size: 11px; color: #64748B; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 700; margin-bottom: 15px;">
+                    Active Attribution Weightings
+                </div>
+                {bar_html}
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
         
     with col_driver2:
-        # Energy Recommendations
         st.write("##### Optimization Recommendations")
-        if is_critical:
-            st.error("💡 High power load detected. Apply these recommendations to lower operating cost:")
-        else:
-            st.info("💡 Consumption loads are stable. Optional suggestions for maximum optimization:")
-            
+        
         rec_list = []
         if ac_hours > 6.0:
-            rec_list.append(f"Decrease active AC cooling by 1 hour to reduce demand by **{engine.coef_[3]:.2f} kWh**.")
+            rec_list.append(f"Decrease active AC cooling by 1 hour to reduce demand by <b>{engine.coef_[3]:.2f} kWh</b>.")
         if occupants > 4:
             rec_list.append("Coordinate large appliance schedules to optimize load distribution.")
         if appliance_hours > 8.0:
@@ -301,11 +305,30 @@ else:
         if temperature > 32.0:
             rec_list.append("Employ shading or passive cooling strategies to limit outdoor thermal gain impact.")
             
+        rec_html = ""
         if rec_list:
             for item in rec_list:
-                st.markdown(f"*   {item}")
+                rec_html += f"<li style='margin-bottom: 8px; color: #E2E8F0; font-size: 13px; line-height: 1.4;'>{item}</li>"
         else:
-            st.markdown("*   All operational parameters are optimally configured.")
+            rec_html = "<li style='margin-bottom: 8px; color: #E2E8F0; font-size: 13px;'>All operational parameters are optimally configured.</li>"
+            
+        alert_bg = "#7F1D1D" if is_critical else "#064E3B"
+        alert_border = "#F87171" if is_critical else "#34D399"
+        alert_text = "#FECACA" if is_critical else "#A7F3D0"
+        alert_msg = "💡 High power load detected. Apply recommendations:" if is_critical else "💡 Consumption loads stable. Optimization tips:"
+        
+        st.markdown(f"""
+        <div style="background-color: #121620; border: 1px solid #1E293B; border-radius: 6px; padding: 20px; min-height: 275px; display: flex; flex-direction: column; justify-content: flex-start;">
+            <div>
+                <div style="background-color: {alert_bg}; border: 1px solid {alert_border}; color: {alert_text}; padding: 10px 14px; border-radius: 4px; font-size: 13px; font-weight: 500; margin-bottom: 15px;">
+                    {alert_msg}
+                </div>
+                <ul style="margin: 0; padding-left: 20px;">
+                    {rec_html}
+                </ul>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
     # Model Insights & Diagnostics
     st.markdown('<div class="section-header">Predictive Engine Diagnostics</div>', unsafe_allow_html=True)
