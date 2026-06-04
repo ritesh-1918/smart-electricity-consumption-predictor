@@ -26,6 +26,10 @@ pinned: false
 > ### 🌐 **[LIVE APP DEMO]**
 > Want to test the model yourself in real time? Try the live interactive web app deployed on Hugging Face:
 > 👉 **[Launch Volterra on Hugging Face Spaces](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)**
+> 
+> ### 📖 **[WORKSHOP PARTICIPANTS HANDOUT]**
+> Deployed this project and looking for the master resource manual?
+> 👉 **[All-in-One Handoff & Code Manual (COMPLETE_HANDOFF_GUIDE.md)](resources/COMPLETE_HANDOFF_GUIDE.md)**
 
 ---
 
@@ -175,6 +179,7 @@ This application is deployed live in production on **Hugging Face Spaces**:
 
 For participants of our live energy forecasting session, all deliverables and roadmaps are compiled here:
 
+*   **[COMPLETE_HANDOFF_GUIDE.md](resources/COMPLETE_HANDOFF_GUIDE.md)**: **[RECOMMENDED] Complete All-in-One End-to-End Handoff & Code Manual**
 *   **[WORKSHOP_RESOURCES.md](resources/WORKSHOP_RESOURCES.md)**: Main Deliverables Handoff Hub
 *   **[LEARNING_PATH.md](resources/LEARNING_PATH.md)**: Next Steps Machine Learning Roadmap
 *   **[PROJECT_OVERVIEW.md](resources/PROJECT_OVERVIEW.md)**: Mathematical Solver and Data Architecture Details

@@ -18,7 +18,8 @@ This document serves as your single point of reference to access all slides, cod
 
 ## 📂 Handoff Package Files
 
-Explore the detailed sub-guides in this folder to continue your machine learning journey:
+Explore our comprehensive guides to continue your machine learning journey:
+*   **[COMPLETE_HANDOFF_GUIDE.md](COMPLETE_HANDOFF_GUIDE.md)**: **[RECOMMENDED] Complete All-in-One End-to-End Handout & Code Manual** (contains all steps and code in a single file).
 1.  **[LEARNING_PATH.md](LEARNING_PATH.md)**: Recommended step-by-step ML roadmap.
 2.  **[PROJECT_OVERVIEW.md](PROJECT_OVERVIEW.md)**: Explanation of the linear regression mathematical formula and system design.
 3.  **[FAQ.md](FAQ.md)**: Answers to common questions asked during the live Q&A session.
