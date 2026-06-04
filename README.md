@@ -10,12 +10,22 @@ pinned: false
 
 # ⚡ Volterra: Intelligent Energy Analytics Engine
 
-[![License: MIT](https://img.shields.Format/badge/License-MIT-blue.svg)](LICENSE)
-[![Python Version](https://img.shields.Format/badge/Python-3.8%2B-blue)](requirements.txt)
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
-[![Model Accuracy](https://img.shields.Format/badge/R2%20Accuracy-94.95%25-green)](src/train.py)
+<div align="center">
 
-An end-to-end machine learning platform for forecasting household electricity consumption using environmental and behavioral factors. Volterra transforms raw utility telemetry data into actionable intelligence, enabling predictive load management, cost projections, and carbon footprint tracking through a production-grade SaaS interface.
+### 🚀 **[LIVE DEMO] Try Volterra on Hugging Face Spaces**
+👉 **[LAUNCH INTERACTIVE SAAS DASHBOARD](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)** 👈
+
+[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-FFD21E?style=for-the-badge&logo=huggingface&logoColor=black)](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)
+[![Model Accuracy](https://img.shields.io/badge/Model%20Accuracy-94.95%25%20R2-success?style=for-the-badge&logo=scikit-learn&logoColor=white)](src/train.py)
+[![Python Version](https://img.shields.io/badge/Python-3.10-blue?style=for-the-badge&logo=python&logoColor=white)](requirements.txt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-orange?style=for-the-badge)](LICENSE)
+
+</div>
+
+> [!IMPORTANT]
+> ### 🌐 **[LIVE APP DEMO]**
+> Want to test the model yourself in real time? Try the live interactive web app deployed on Hugging Face:
+> 👉 **[Launch Volterra on Hugging Face Spaces](https://huggingface.co/spaces/ritesh19180/smart-electricity-consumption-predictor)**
 
 ---
 
@@ -79,6 +89,30 @@ The model assigns the following coefficients to input variables (representing da
 *   **Temperature**: `+1.8166`
 *   **Humidity**: `+0.2958`
 *   **Intercept (Baseline Constant)**: `0.4721`
+
+---
+
+## 🧮 Interactive Model Simulator (Calculate Offline!)
+
+You don't need the web dashboard to see how our model thinks. You can calculate your household forecast manually in **30 seconds** using our learned equation:
+
+$$\text{Daily Load (kWh)} \approx 0.47 + (1.82 \times \text{Temp}) + (0.30 \times \text{Humidity}) + (8.01 \times \text{Occupants}) + (4.45 \times \text{AC Hours}) + (2.17 \times \text{Appliance Hours}) + (5.13 \text{ if Weekend})$$
+
+### 🏃 Try These Real-World Scenarios:
+
+| Scenario | Temperature | Occupants | AC Hours | Appliance Hours | Day Type | Estimated Consumption |
+| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Eco Mode (Weekday)** | 24°C | 3 | 2h | 4h | Weekday (0) | **$\approx 85.3$ kWh** |
+| **Baseline Normal** | 26°C | 4 | 4h | 6h | Weekday (0) | **$\approx 126.8$ kWh** |
+| **Peak Hot Day (Weekend)** | 42°C | 6 | 14h | 12h | Weekend (1) | **$\approx 221.7$ kWh** |
+
+### 📊 Weight Influence Hierarchy (Relative Feature Impact)
+*   **Occupant Count**: `[|||||||| ]` (+8.01 kWh per person)
+*   **Weekend Day**: `[|||||    ]` (+5.13 kWh shift)
+*   **AC Runtime**: `[||||     ]` (+4.45 kWh per active hour)
+*   **Appliance Runtime**: `[||       ]` (+2.17 kWh per active hour)
+*   **Outdoor Temp**: `[|        ]` (+1.82 kWh per °C)
+*   **Relative Humidity**: `[         ]` (+0.30 kWh per % RH)
 
 ---
 
